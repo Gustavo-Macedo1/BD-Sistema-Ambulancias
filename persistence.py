@@ -32,15 +32,6 @@ def get_column_types(cnx, table_name, schema="gestaoambulancias"):
     cursor.close()
     return types
 
-# Retorna tabela completa
-def select_all(cnx, table):
-  if cnx.is_connected():
-    cursor = cnx.cursor()
-    query = f"SELECT * FROM {table};"
-    cursor.execute(query)
-    results = cursor.fetchall()
-    return results
-
 # Retorna tabela completa em DataFrame
 def select_all_df(cnx, table):
   if cnx.is_connected():

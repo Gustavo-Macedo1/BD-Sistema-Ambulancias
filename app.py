@@ -1,11 +1,25 @@
 import streamlit as st
 import time
+import datetime
 from persistence import *
 
 st.title("🚑 Sistema de Despacho de Ambulâncias - CRUD")
 st.divider()
 
 cnx = connect_bd()
+
+st.subheader("Visualização das views")
+t1, t2, t3 = st.tabs(["Ambulâncias em uso", "Histórico - Despacho/Equipe", "Relatório - Transporte/Hospital"])
+
+with t1:
+    view = select_all_df(cnx, "vw_ambulanciasemuso")
+    st.write(view)
+with t2:
+    view = select_all_df(cnx, "vw_historicodespachoequipe")
+    st.write(view)
+with t3:    
+    view = select_all_df(cnx, "vw_relatoriotransportehospital")
+    st.write(view)
 
 st.subheader("Visualização das tabelas")
 
@@ -35,6 +49,7 @@ for tab in tabs:
             options = st.multiselect(
                 "Selecione as colunas para inserir dados:",
                 df.columns[1:],
+                default=df.columns[1:]
                 )
             query += ", ".join(list(options)) + ") VALUES ("
 
@@ -44,6 +59,8 @@ for tab in tabs:
                     file = st.file_uploader(f"Faça upload da imagem para {option}:", type=['png', 'jpg', 'jpeg'], key=f"{option}_uploader_{tabs.index(tab)}")
                     if file:
                         value = file.read() # Valor já em bytes
+                elif "data" in option.lower():
+                    value = st.datetime_input(f"Selecione a data para {option}:", key=f"{option}_date_{tabs.index(tab)}")
                 else:
                     value = st.text_input(f"Insira o valor para {option}:", key=f"{option}_input_{tabs.index(tab)}")
                 query += "%s, "
@@ -70,6 +87,8 @@ for tab in tabs:
                     file = st.file_uploader(f"Coluna: {column}:", type=['png', 'jpg', 'jpeg'], key=f"{column}_uploader_{tabs.index(tab)}")
                     if file:
                         new_value = file.read() # Valor já em bytes
+                elif "data" in column.lower():
+                    new_value = st.datetime_input(f"Selecione a data para {column}:", key=f"{column}_date_{tabs.index(tab)}")
                 else:
                     new_value = st.text_input(f"Coluna: {column}", key=f"update_{column}_input_{tabs.index(tab)}")
                 
